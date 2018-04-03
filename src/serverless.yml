@@ -17,6 +17,9 @@ provider:
   name: aws
   runtime: python2.7
   region: eu-central-1
+  environment:
+    AV_DEFINITION_S3_BUCKET: ${opt:AV_DEFINITION_S3_BUCKET, 'clamav.definition'}
+
 
 # you can overwrite defaults here
 #  stage: dev
@@ -94,12 +97,12 @@ functions:
 #      variable2: value2
 
 # you can add CloudFormation resource templates here
-#resources:
-#  Resources:
-#    NewResource:
-#      Type: AWS::S3::Bucket
-#      Properties:
-#        BucketName: my-new-bucket
+resources:
+  Resources:
+    AvDefinitionBucket:
+      Type: AWS::S3::Bucket
+      Properties:
+        BucketName: ${self:provider.environment.AV_DEFINITION_S3_BUCKET}
 #  Outputs:
 #     NewOutput:
 #       Description: "Description for the output"
