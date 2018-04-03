@@ -39,8 +39,8 @@ the [amazonlinux](https://hub.docker.com/_/amazonlinux/) [Docker](https://www.do
 
 ### AV Defintion Bucket
 
-Create an s3 bucket to store current antivirus definitions.  This
-provides the fastest download speeds for the scanner.  This bucket can
+Create an s3 bucket called `clamav.definition` to store current antivirus definitions.
+This provides the fastest download speeds for the scanner.  This bucket can
 be kept as private.  
 
 To allow public access, useful for other accounts,
@@ -58,26 +58,20 @@ add the following policy to the bucket.
                 "s3:GetObject",
                 "s3:GetObjectTagging"
             ],
-            "Resource": "arn:aws:s3:::<bucket-name>/*"
+            "Resource": "arn:aws:s3:::clamav.definition/*"
         }
     ]
 }
 ```
 
-### Definition Update Lambda (Outdated. Lambda functions should be downloaded with the serverless.)
+### Definition Update Lambda
 
 This function accesses the user’s ClamAV instance to download
 updated definitions using `freshclam`.  It is recommended to run
 this every 3 hours to stay protected from the latest threats.
 
-1. Go to the *Lambda* menu in your AWS management console.
-2. Choose xxxx-update_av function.
-3. Add a single environment variable named `AV_DEFINITION_S3_BUCKET`
-and set its value to the name of the bucket created to store your AV
-definitions.
-4. Set *Timeout* to **5 minutes** and *Memory* to **512**
-5.  Create a new role that uses the following policy document. 
-Replace <bucket-name> with the bucket created to store your AV definitions.
+1. Go to the *Lambda* menu in your AWS management console and choose `xxxx-update_av` function.
+2. Create a new role that uses the following policy document. 
 ```json
 {
    "Version":"2018-04-03",
@@ -100,32 +94,19 @@ Replace <bucket-name> with the bucket created to store your AV definitions.
             "s3:PutObjectVersionTagging"
          ],
          "Effect":"Allow",
-         "Resource":"arn:aws:s3:::<bucket-name>/*"
+         "Resource":"arn:aws:s3:::clamav.definition/*"
       }
    ]
 }
 ```
-5. Test the function with *any* data document. 
+3. Test the function with *any* data document. 
 It should return `null`. Information is written into *stdout*
 
 
 ### AV Scanner Lambda (Outdated. Lambda functions should be downloaded with the serverless.)
 
-1. Create the archive using the method in the
- [Build from Source](#build-from-source) section.
-2. From the AWS Lambda Dashboard, click **Create function**
-3. Choose **Author from scratch** on the *Select Blueprint* page
-4. Add a new trigger of type **S3 Event** using `ObjectCreate(all)`.
-5. Name your function `bucket-antivirus-function` when prompted on the
-*Configure function* step.
-6. Set *Runtime* to `Python 2.7`
-7. Choose **Upload a ZIP file** for *Code entry type* and select the archive
-created in step 1.
-7. Add a single environment variable named `AV_DEFINITION_S3_BUCKET`
-and set its value to the name of the bucket created to store your AV
-definitions.
-8. Set *Lambda handler* to `scan.lambda_handler`
-9.  Create a new role name `bucket-antivirus-function` that uses the
+1. Go to the *Lambda* menu in your AWS management console and choose `xxxx-scan` function.
+2.  Create a new role name `bucket-antivirus-function` that uses the
 following policy document
 ```json
 {
@@ -150,10 +131,7 @@ following policy document
    ]
 }
 ```
-10. Before finishing, set *Timeout* to **5 minutes** and *Memory* to
-**1024**
-11. Save the function.  Testing is easiest performed by uploading a
-file to the bucket configured as the trigger in step 4.
+3. Save the function. Configure S3 event (see below) to test the lambda.
 
 ### S3 Events
 

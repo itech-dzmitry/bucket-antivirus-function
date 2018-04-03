@@ -57,11 +57,15 @@ provider:
 functions:
   scan:
     handler: scan.lambda_handler
+    timeout: 300
+    memorySize: 1024
 
   update_av:
     handler: update.lambda_handler
     events:
       - schedule: rate(3 hours)
+    timeout: 300
+    memorySize: 512
 
 #    The following are a few example events you can configure
 #    NOTE: Please make sure to change your handler code to work with those events
@@ -97,12 +101,12 @@ functions:
 #      variable2: value2
 
 # you can add CloudFormation resource templates here
-resources:
-  Resources:
-    AvDefinitionBucket:
-      Type: AWS::S3::Bucket
-      Properties:
-        BucketName: ${self:provider.environment.AV_DEFINITION_S3_BUCKET}
+#resources:
+#  Resources:
+#    NewResource:
+#      Type: AWS::S3::Bucket
+#      Properties:
+#        BucketName: my-new-bucket
 #  Outputs:
 #     NewOutput:
 #       Description: "Description for the output"
