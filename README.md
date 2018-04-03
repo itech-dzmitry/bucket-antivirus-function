@@ -33,10 +33,9 @@ or INFECTED, along with the date and time of the scan.
 
 ### Build from Source
 
-To build the archive to upload to AWS Lambda, run `make`.  The build process is completed using
+To build the archive and upload to AWS Lambda, run `make`.  The build process is completed using
 the [amazonlinux](https://hub.docker.com/_/amazonlinux/) [Docker](https://www.docker.com)
- image.  The resulting archive will be built at `build/lambda.zip`.  This file will be
- uploaded to AWS for both Lambda functions below.
+ image.  The resulting files will be placed at `build/` during the `collect` stage. `serverless` will deploy it on AWS during the `deploy` stage.
 
 ### AV Defintion Bucket
 
@@ -65,7 +64,7 @@ add the following policy to the bucket.
 }
 ```
 
-### Definition Update Lambda
+### Definition Update Lambda (Outdated. Lambda functions should be downloaded with the serverless.)
 
 This function accesses the user’s ClamAV instance to download
 updated definitions using `freshclam`.  It is recommended to run
@@ -110,7 +109,7 @@ Replace <bucket-name> with the bucket created to store your AV definitions.
 It should return `null`. Information is written into *stdout*
 
 
-### AV Scanner Lambda
+### AV Scanner Lambda (Outdated. Lambda functions should be downloaded with the serverless.)
 
 1. Create the archive using the method in the
  [Build from Source](#build-from-source) section.
