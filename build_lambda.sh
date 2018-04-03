@@ -14,16 +14,14 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-lambda_output_file=/opt/app/build/lambda.zip
-
 set -e
 
 yum update -y
-yum install -y cpio python27-pip zip
+yum install -y cpio python27-pip
 pip install --no-cache-dir virtualenv
 virtualenv env
 . env/bin/activate
-pip install --no-cache-dir -r requirements.txt
+pip install --no-cache-dir -r src/requirements.txt
 
 pushd /tmp
 yumdownloader -x \*i686 --archlist=x86_64 clamav clamav-lib clamav-update
@@ -31,11 +29,10 @@ rpm2cpio clamav-0*.rpm | cpio -idmv
 rpm2cpio clamav-lib*.rpm | cpio -idmv
 rpm2cpio clamav-update*.rpm | cpio -idmv
 popd
-mkdir -p bin
-cp /tmp/usr/bin/clamscan /tmp/usr/bin/freshclam /tmp/usr/lib64/* bin/.
-echo "DatabaseMirror database.clamav.net" > bin/freshclam.conf
+rm -rf build/*
+mkdir build/bin
+cp /tmp/usr/bin/clamscan /tmp/usr/bin/freshclam /tmp/usr/lib64/* build/bin/.
+echo "DatabaseMirror database.clamav.net" > build/bin/freshclam.conf
 
-mkdir -p build
-zip -r9 $lambda_output_file *.py bin
-cd env/lib/python2.7/site-packages
-zip -r9 $lambda_output_file *
+cp src/* build
+cp -r env/lib/python2.7/site-packages/* build

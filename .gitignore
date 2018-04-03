@@ -1,3 +1,8 @@
+# Output directory.
+build/*
+!build/.empty.txt
+
+
 # Idea
 .idea
 *.iml
@@ -7,29 +12,6 @@ __pycache__/
 *.py[cod]
 *$py.class
 
-# C extensions
-*.so
-
-# Distribution / packaging
-.Python
-env/
-build/
-develop-eggs/
-dist/
-downloads/
-eggs/
-.eggs/
-lib/
-lib64/
-parts/
-sdist/
-var/
-wheels/
-*.egg-info/
-.installed.cfg
-*.egg
-bin/
-compile/*.zip
 
 # PyInstaller
 #  Usually these files are written by a python script from a template
