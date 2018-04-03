@@ -71,26 +71,17 @@ This function accesses the user’s ClamAV instance to download
 updated definitions using `freshclam`.  It is recommended to run
 this every 3 hours to stay protected from the latest threats.
 
-1. Create the archive using the method in the
- [Build from Source](#build-from-source) section.
-2. From the AWS Lambda Dashboard, click **Create function**
-3. Choose **Author from scratch** on the *Select Blueprint* page
-4. Create a new trigger of type **CloudWatch Event** using `rate(3 hours)`
-for the **Schedule expression**.  Be sure to check **Enable trigger**
-5. Name your function `bucket-antivirus-update` when prompted on the
-*Configure function* step.
-6. Set *Runtime* to `Python 2.7`
-7. Choose **Upload a ZIP file** for *Code entry type* and select the archive
-downloaded in step 1.
-8. Add a single environment variable named `AV_DEFINITION_S3_BUCKET`
+1. Go to the *Lambda* menu in your AWS management console.
+2. Choose xxxx-update_av function.
+3. Add a single environment variable named `AV_DEFINITION_S3_BUCKET`
 and set its value to the name of the bucket created to store your AV
 definitions.
-9. Set *Lambda handler* to `update.lambda_handler`
-10.  Create a new role name `bucket-antivirus-update` that uses the
-following policy document
+4. Set *Timeout* to **5 minutes** and *Memory* to **512**
+5.  Create a new role that uses the following policy document. 
+Replace <bucket-name> with the bucket created to store your AV definitions.
 ```json
 {
-   "Version":"2012-10-17",
+   "Version":"2018-04-03",
    "Statement":[
       {
          "Effect":"Allow",
@@ -115,10 +106,9 @@ following policy document
    ]
 }
 ```
-11. Before finishing, set *Timeout* to **5 minutes** and *Memory* to
-**512**
-12. Save and test your function.  If prompted for test data, just use
-the default provided.
+5. Test the function with *any* data document. 
+It should return `null`. Information is written into *stdout*
+
 
 ### AV Scanner Lambda
 
