@@ -33,7 +33,7 @@ or INFECTED, along with the date and time of the scan.
 
 ### Build from Source
 
-To build the archive and upload to AWS Lambda, run `make`.  The build process is completed using
+To build the functions and upload to AWS Lambda, run `make`.  The build process is completed using
 the [amazonlinux](https://hub.docker.com/_/amazonlinux/) [Docker](https://www.docker.com)
  image.  The resulting files will be placed at `build/` during the `collect` stage. `serverless` will deploy it on AWS during the `deploy` stage.
 
