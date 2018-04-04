@@ -70,72 +70,25 @@ This function accesses the user’s ClamAV instance to download
 updated definitions using `freshclam`.  It is recommended to run
 this every 3 hours to stay protected from the latest threats.
 
-1. Go to the *Lambda* menu in your AWS management console and choose `xxxx-update_av` function.
-2. Create a new role that uses the following policy document. 
-```json
-{
-   "Version":"2018-04-03",
-   "Statement":[
-      {
-         "Effect":"Allow",
-         "Action":[
-            "logs:CreateLogGroup",
-            "logs:CreateLogStream",
-            "logs:PutLogEvents"
-         ],
-         "Resource":"*"
-      },
-      {
-         "Action":[
-            "s3:GetObject",
-            "s3:GetObjectTagging",
-            "s3:PutObject",
-            "s3:PutObjectTagging",
-            "s3:PutObjectVersionTagging"
-         ],
-         "Effect":"Allow",
-         "Resource":"arn:aws:s3:::clamav.definition/*"
-      }
-   ]
-}
+The function is deployed and fully configured as `xxxx-update_av` Lambda function. 
+You can test in on aws or locally running the following command from the `build` directory:
 ```
-3. Test the function with *any* data document. 
-It should return `null`. Information is written into *stdout*
-
-
-### AV Scanner Lambda (Outdated. Lambda functions should be downloaded with the serverless.)
-
-1. Go to the *Lambda* menu in your AWS management console and choose `xxxx-scan` function.
-2.  Create a new role name `bucket-antivirus-function` that uses the
-following policy document
-```json
-{
-   "Version":"2012-10-17",
-   "Statement":[
-      {
-         "Effect":"Allow",
-         "Action":[
-            "logs:CreateLogGroup",
-            "logs:CreateLogStream",
-            "logs:PutLogEvents"
-         ],
-         "Resource":"*"
-      },
-      {
-         "Action":[
-            "s3:*"
-         ],
-         "Effect":"Allow",
-         "Resource":"*"
-      }
-   ]
-}
+serverless invoke -f update_av
 ```
-3. Save the function. Configure S3 event (see below) to test the lambda.
+
+It should return null. See logs on the CloudWatch for details.
+
+
+### AV Scanner Lambda 
+
+This function uploads all just downloaded files from configured buckets (see *S3 Events* below)
+and sets 2 tags: `av-status` and `av-timestamp`. 
+`av-status` is either `CLEAN` or `INFECTED`
+`av-timestamp` is a scan time in format `2018/04/04 08:04:24 UTC`
 
 ### S3 Events
 
-Configure scanning of additional buckets by adding a new S3 event to
+Configure scanning of buckets by adding a new S3 event to
 invoke the Lambda function.  This is done from the properties of any
 bucket in the AWS console.
 

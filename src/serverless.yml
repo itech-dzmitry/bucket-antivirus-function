@@ -41,10 +41,6 @@ provider:
 #            - "Ref" : "ServerlessDeploymentBucket"
 #            - "/*"
 
-# you can define service wide environment variables here
-#  environment:
-#    variable1: value1
-
 # you can add packaging information here
 #package:
 #  include:
@@ -59,6 +55,7 @@ functions:
     handler: scan.lambda_handler
     timeout: 300
     memorySize: 1024
+    role: RoleScan
 
   update_av:
     handler: update.lambda_handler
@@ -66,6 +63,7 @@ functions:
       - schedule: rate(3 hours)
     timeout: 300
     memorySize: 512
+    role: RoleUpdate
 
 #    The following are a few example events you can configure
 #    NOTE: Please make sure to change your handler code to work with those events
@@ -101,12 +99,67 @@ functions:
 #      variable2: value2
 
 # you can add CloudFormation resource templates here
-#resources:
-#  Resources:
-#    NewResource:
-#      Type: AWS::S3::Bucket
-#      Properties:
-#        BucketName: my-new-bucket
+resources:
+  Resources:
+    RoleUpdate:
+      Type: AWS::IAM::Role
+      Properties:
+        RoleName: update-clamav
+        AssumeRolePolicyDocument:
+          Version: "2012-10-17"
+          Statement:
+            - Effect: Allow
+              Principal:
+                Service:
+                  - lambda.amazonaws.com
+              Action: sts:AssumeRole
+        Policies:
+          - PolicyName: read-write-clamav-definition
+            PolicyDocument:
+              Version: "2012-10-17"
+              Statement:
+                - Effect: Allow 
+                  Action:
+                    - logs:CreateLogGroup
+                    - logs:CreateLogStream
+                    - logs:PutLogEvents
+                  Resource: '*'
+                - Effect: Allow
+                  Action:
+                    - s3:GetObject
+                    - s3:GetObjectTagging
+                    - s3:PutObject
+                    - s3:PutObjectTagging
+                    - s3:PutObjectVersionTagging
+                  Resource: "arn:aws:s3:::${self:provider.environment.AV_DEFINITION_S3_BUCKET}/*"
+    RoleScan:
+      Type: AWS::IAM::Role
+      Properties:
+        RoleName: scan-clamav
+        AssumeRolePolicyDocument:
+          Version: "2012-10-17"
+          Statement:
+            - Effect: Allow
+              Principal:
+                Service:
+                  - lambda.amazonaws.com
+              Action: sts:AssumeRole
+        Policies:
+          - PolicyName: scan-s3-by-clamav
+            PolicyDocument:
+              Version: "2012-10-17"
+              Statement:
+                - Effect: Allow 
+                  Action:
+                    - logs:CreateLogGroup
+                    - logs:CreateLogStream
+                    - logs:PutLogEvents
+                  Resource: '*'
+                - Effect: Allow
+                  Action:
+                    - s3:*
+                  Resource: "*"
+            
 #  Outputs:
 #     NewOutput:
 #       Description: "Description for the output"
