@@ -96,7 +96,7 @@ bucket in the AWS console.
 
 Note: If configured to update object metadata, events must only be
 configured for `PUT` and `POST`. Metadata is immutable, which requires
-the function to copy the object over itself with updated metadata. This
+the function to *copy* the object over itself with updated metadata. This
 can cause a continuous loop of scanning if improperly configured.
 
 
@@ -177,6 +177,7 @@ It should be in the format provided below:
 
 ```
 Upside Travel, Inc.
+Modified by dzmitry.dziamidau@itechart-group.com
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
