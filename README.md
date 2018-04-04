@@ -12,6 +12,12 @@ Scan new objects added to any s3 bucket using AWS Lambda. [more details in this 
 - Accesses the end-user’s separate installation of
 open source antivirus engine [ClamAV](http://www.clamav.net/)
 
+## Requirements
+- make
+- [docker](https://www.docker.com)
+- [serverless](https://serverless.com)
+
+
 ## How Does It Work?
 
 ![](../master/images/bucket-antivirus-function.png)
