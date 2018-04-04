@@ -132,7 +132,27 @@ the table below for reference.
 
 ## S3 Bucket Policy Examples
 
-### Deny to download the object if not "CLEAN"
+### Deny to download and re-tag "INFECTED" object
+```
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Effect": "Deny",
+      "Action": ["s3:GetObject", "s3:PutObjectTagging"],
+      "Principal": "*",
+      "Resource": ["arn:aws:s3:::<<bucket-name>>/*"],
+      "Condition": {
+        "StringEquals": {
+          "s3:ExistingObjectTag/av-status": "INFECTED"
+        }
+      }
+    }
+  ]
+}
+```
+
+### (!!!DOESN'T WORK FOR ME!!!) Deny to download the object if not "CLEAN"
 This policy doesn't allow to download the object until:
 1) The lambda that run Clam-AV is finished (so the object has a tag)
 2) The file is not CLEAN
@@ -159,25 +179,7 @@ It should be in the format provided below:
 }
 ```   
 
-### Deny to download and re-tag "INFECTED" object
-```
-{
-  "Version": "2012-10-17",
-  "Statement": [
-    {
-      "Effect": "Deny",
-      "Action": ["s3:GetObject", "s3:PutObjectTagging"],
-      "Principal": "*",
-      "Resource": ["arn:aws:s3:::<<bucket-name>>/*"],
-      "Condition": {
-        "StringEquals": {
-          "s3:ExistingObjectTag/av-status": "INFECTED"
-        }
-      }
-    }
-  ]
-}
-```
+
 
 ## License
 
