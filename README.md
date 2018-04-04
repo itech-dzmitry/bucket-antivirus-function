@@ -76,8 +76,8 @@ This function accesses the user’s ClamAV instance to download
 updated definitions using `freshclam`.  It is recommended to run
 this every 3 hours to stay protected from the latest threats.
 
-The function is deployed and fully configured as `xxxx-update_av` Lambda function. 
-You can test in on aws or locally running the following command from the `build` directory:
+The function is deployed and fully configured as `xxxx-update_av` Lambda. 
+You can test it on aws or locally running the following command from the `build` directory:
 ```
 serverless invoke -f update_av
 ```
