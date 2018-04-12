@@ -38,17 +38,20 @@ or INFECTED, along with the date and time of the scan.
 ## Installation
 
 ### Configure AWS+serverless
+1. Login to your Amazon Web Services Account and go to the Identity & Access Management (IAM) page.
 
-    1. Login to your Amazon Web Services Account and go to the Identity & Access Management (IAM) page.
+2. Click on **Users** and then **Add user**. Enter a name in the first field to remind you this User is the Framework, like `serverless-admin`. Enable **Programmatic access** by clicking the checkbox. 
 
-    2. Click on Users and then Add user. Enter a name in the first field to remind you this User is the Framework, like `serverless-admin`. Enable Programmatic access by clicking the checkbox. 
+3. Use narrowed permissions defined in [serverless-policy.json](serverless-policy.json) for this AWS user. Replace `${service}` with `clamav` - service name defined in [serverless.yaml](src/serverless.yaml). Thanks [unknown github user](https://github.com/serverless/serverless/issues/1439) for the help building it.
 
-    3. Use narrowed permissions for this AWS user defined in the [serverless-policy.json](serverless-policy.json) file. Replace `${service}` with `clamav` - service name defined in the [serverless.yaml](src/serverless.yaml). Thanks [unknown github user](https://github.com/serverless/serverless/issues/1439) for the help building it.
-
-    4. View and copy the API Key & Secret to a temporary place. 
+4. View and copy the **API Key** & **Secret** to a temporary place. 
     
-    5. Run 
+5. Run 
+
     `serverless config credentials --provider aws --key <API key> --secret <Secret>`
+    
+
+That's it! Now your `serverless` cli is configured to work with your AWS account. You can change API key and Secret by running the same command with `-o` key (override).
 
 
 
