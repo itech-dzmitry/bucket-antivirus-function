@@ -24,35 +24,6 @@
         {
             "Effect": "Allow",
             "Action": [
-                "lambda:Get*",
-                "lambda:List*",
-                "lambda:CreateFunction"
-            ],
-            "Resource": "*"
-        },
-        {
-            "Effect": "Allow",
-            "Action": [
-                "lambda:AddPermission",
-                "lambda:CreateAlias",
-                "lambda:DeleteFunction",
-                "lambda:InvokeFunction",
-                "lambda:PublishVersion",
-                "lambda:RemovePermission",
-                "lambda:Update*"
-            ],
-            "Resource": "arn:aws:lambda:*:*:function:${service}*"
-        },
-        {
-            "Effect": "Allow",
-            "Action": [
-                "lambda:*"
-            ],
-            "Resource": "*"
-        },
-        {
-            "Effect": "Allow",
-            "Action": [
                 "apigateway:GET"
             ],
             "Resource": [
@@ -146,6 +117,27 @@
                 "events:Describe*"
             ],
             "Resource": "arn:aws:events:*:*:rule/${service}*"
-        }
+        },
+        {
+            "Effect": "Allow",
+            "Action": [
+                "lambda:GetFunction",
+                "lambda:CreateFunction",
+                "lambda:DeleteFunction",
+                "lambda:UpdateFunctionConfiguration",
+                "lambda:UpdateFunctionCode",
+                "lambda:ListVersionsByFunction",
+                "lambda:PublishVersion",
+                "lambda:CreateAlias",
+                "lambda:DeleteAlias",
+                "lambda:UpdateAlias",
+                "lambda:GetFunctionConfiguration",
+                "lambda:AddPermission",
+                "lambda:InvokeFunction"
+            ],
+            "Resource": [
+                "arn:aws:lambda:*:*:function:${service}*"
+            ]
+        },
     ]
 }
