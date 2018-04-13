@@ -138,6 +138,6 @@
             "Resource": [
                 "arn:aws:lambda:*:*:function:${service}*"
             ]
-        },
+        }
     ]
 }
