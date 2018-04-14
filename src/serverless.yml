@@ -157,8 +157,19 @@ resources:
                   Resource: '*'
                 - Effect: Allow
                   Action:
-                    - s3:*
-                  Resource: "*"
+                    - s3:GetObject
+                    - s3:GetObjectTagging
+                    - s3:PutObjectTagging
+                  Sid: "AccessBucketsToScan"
+                  Resource:
+                    - "arn:aws:s3:::bucket-to-scan/*"
+                - Effect: Allow
+                  Action:
+                    - s3:GetObject
+                    - s3:ListObjects
+                    - s3:GetObjectTagging
+                  Resource: "arn:aws:s3:::${self:provider.environment.AV_DEFINITION_S3_BUCKET}/*"
+
             
 #  Outputs:
 #     NewOutput:
