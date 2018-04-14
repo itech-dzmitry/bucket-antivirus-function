@@ -22,7 +22,7 @@ from subprocess import check_output, Popen, PIPE, STDOUT
 
 
 def current_library_search_path():
-    ld_verbose = check_output(["ld", "--verbose"])
+    ld_verbose = check_output(["ld", "--verbose"]).decode()
     rd_ld = re.compile("SEARCH_DIR\(\"([A-z0-9/-]*)\"\)")
     return rd_ld.findall(ld_verbose)
 
@@ -76,7 +76,7 @@ def update_defs_from_freshclam(path, library_path=""):
         stdout=PIPE,
         env=fc_env
     )
-    output = fc_proc.communicate()[0]
+    output = fc_proc.communicate()[0].decode()
     print("freshclam output:\n%s" % output)
     if fc_proc.returncode != 0:
         print("Unexpected exit code from freshclam: %s." % fc_proc.returncode)
@@ -124,7 +124,7 @@ def scan_file(path):
         stdout=PIPE,
         env=av_env
     )
-    output = av_proc.communicate()[0]
+    output = av_proc.communicate()[0].decode()
     print("clamscan output:\n%s" % output)
     if av_proc.returncode == 0:
         return AV_STATUS_CLEAN

@@ -17,9 +17,8 @@
 set -e
 
 yum update -y
-yum install -y cpio python27-pip
-pip install --no-cache-dir virtualenv
-virtualenv env
+yum install -y cpio python36
+python3 -m venv env
 . env/bin/activate
 pip install --no-cache-dir -r src/requirements.txt
 
@@ -35,4 +34,4 @@ cp /tmp/usr/bin/clamscan /tmp/usr/bin/freshclam /tmp/usr/lib64/* build/bin/.
 echo "DatabaseMirror database.clamav.net" > build/bin/freshclam.conf
 
 cp src/* build
-cp -r env/lib/python2.7/site-packages/* build
+cp -r env/lib/python3.6/site-packages/* build
