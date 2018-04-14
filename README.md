@@ -67,34 +67,13 @@ Create an s3 bucket called `clamav.definition` to store current antivirus defini
 This provides the fastest download speeds for the scanner.  This bucket can
 be kept as private.  
 
-To allow public access, useful for other accounts,
-add the following policy to the bucket.
-
-```json
-{
-    "Version": "2012-10-17",
-    "Statement": [
-        {
-            "Sid": "AllowPublic",
-            "Effect": "Allow",
-            "Principal": "*",
-            "Action": [
-                "s3:GetObject",
-                "s3:GetObjectTagging"
-            ],
-            "Resource": "arn:aws:s3:::clamav.definition/*"
-        }
-    ]
-}
-```
-
 ### Definition Update Lambda
 
 This function accesses the user’s ClamAV instance to download
 updated definitions using `freshclam`.  It is recommended to run
 this every 3 hours to stay protected from the latest threats.
 
-The function is deployed and fully configured as `xxxx-update_av` Lambda. 
+The function is deployed and fully configured as `clamav-xxxx-update_av` Lambda. 
 You can test it on aws or locally running the following command from the `build` directory:
 ```
 serverless invoke -f update_av
@@ -112,16 +91,28 @@ and sets 2 tags: `av-status` and `av-timestamp`.
 
 ### S3 Events
 
-Configure scanning of buckets by adding a new S3 event to
-invoke the Lambda function.  This is done from the properties of any
+Configuration of scanning buckets consists of 2 parts (described below):
+
+* Configuring s3 event.
+* Configuring the `scan` lambda policy.
+
+
+**S3 event**
+
+Add a new S3 event to invoke the Lambda function.  This is done from the properties of any
 bucket in the AWS console.
 
 ![](../master/images/s3-event.png)
 
-Note: If configured to update object metadata, events must only be
-configured for `PUT` and `POST`. Metadata is immutable, which requires
-the function to *copy* the object over itself with updated metadata. This
-can cause a continuous loop of scanning if improperly configured.
+
+**The scan lambda policy**
+
+* Open AWS IAM service.
+* Choose the `Roles` menu.
+* Select `scan-clamav` role and edit its policy.
+* Find policy with `"Sid": "AccessBucketsToScan"`. There is a default bucket in the 
+`Resource` part `"arn:aws:s3:::bucket-to-scan/*"`. Replace `<bucket-to-scan>` with 
+the target bucket. Add new buckets into the list in the same way. 
 
 
 ## Configuration
