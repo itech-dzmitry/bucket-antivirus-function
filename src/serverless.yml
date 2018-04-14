@@ -123,7 +123,7 @@ resources:
                     - logs:CreateLogGroup
                     - logs:CreateLogStream
                     - logs:PutLogEvents
-                  Resource: '*'
+                  Resource: 'arn:aws:logs:*:*:log-group:/aws/lambda/${self:service}-*-update_av:log-stream:*'
                 - Effect: Allow
                   Action:
                     - s3:GetObject
@@ -154,7 +154,7 @@ resources:
                     - logs:CreateLogGroup
                     - logs:CreateLogStream
                     - logs:PutLogEvents
-                  Resource: '*'
+                  Resource: 'arn:aws:logs:*:*:log-group:/aws/lambda/${self:service}-*-scan:log-stream:*'
                 - Effect: Allow
                   Action:
                     - s3:GetObject
