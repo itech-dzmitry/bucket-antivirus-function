@@ -62,7 +62,8 @@ You can change API key and Secret by running the same command with `-o` key (ove
 
 Choose any unique name for the bucket to store current antivirus definitions. This bucket can
 be kept as private.
-Set environment variable:
+
+**Set environment variable** (!!!!):
 
 `AV_DEFINITION_S3_BUCKET=JUST_CREATED_BUCKET_NAME`
 
@@ -77,14 +78,14 @@ The resulting files will be placed at `build/` during the `collect` stage.
 After the deployment 2 lambda functions will be added to your AWS account: **update_av** and **scan** 
 
 
-### Definition Update Lambda (update_av)**
+### Definition Update Lambda (update_av)
 
 This function accesses the user’s ClamAV instance to download
 updated definitions using `freshclam`.  
 
 The function is deployed and configured to run once per 3 hours as `clamav-xxxx-update_av` Lambda.
  
-Run it with either either of 2 ways:
+Run it in either of 2 ways to be sure it deployed successfully:
  * AWS Lambda *Test* button 
  * Run the following command from the local `build` directory:
  
@@ -97,16 +98,8 @@ It should return null. See logs on the **CloudWatch** for details in case of any
 
 Configuration of buckets to be scanned consists of 2 steps:
 
-* Configuring s3 event.
 * Configuring the `scan` lambda policy.
-
-
-**S3 event**
-
-Add a new S3 event to invoke the Lambda function.  This is done from the properties of any
-bucket in the AWS console.
-
-![](../master/images/s3-event.png)
+* Configuring s3 event.
 
 
 **The scan lambda policy**
@@ -120,10 +113,19 @@ bucket in the AWS console.
 * Add new buckets into the list in the same way. 
 
 
+**S3 event**
+
+Add a new S3 event to invoke the Lambda function.  This is done from the properties of any
+bucket in the AWS console.
+
+![](../master/images/s3-event.png)
+
+
+
 ### Run it!
 
 Upload a couple of files into the bucket you've just configured. 
-Use [EICAR test file](https://en.wikipedia.org/wiki/EICAR_test_file) to simulate infected file upload.
+Use [EICAR test file](https://en.wikipedia.org/wiki/EICAR_test_file) as a sample infected file.
 
 S3 event invokes the **scan** lambda which sets following 2 tags:
   
@@ -134,6 +136,12 @@ S3 event invokes the **scan** lambda which sets following 2 tags:
 
 
 See logs on the **CloudWatch** for details.
+
+
+### How to remove it?
+
+Run `serverless remove` from the local `build` directory to remove the antivirus.
+
 
 
 ## Configuration
