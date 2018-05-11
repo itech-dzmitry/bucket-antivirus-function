@@ -19,7 +19,7 @@
                 "cloudformation:UpdateStack",
                 "cloudformation:DeleteStack"
             ],
-            "Resource": "arn:aws:cloudformation:*:*:stack/${service}*"
+            "Resource": "arn:aws:cloudformation:*:*:stack/clamav*"
         },
         {
             "Effect": "Allow",
@@ -52,17 +52,17 @@
         {
             "Effect": "Allow",
             "Action": "kinesis:*",
-            "Resource": "arn:aws:kinesis:*:*:stream/${service}*"
+            "Resource": "arn:aws:kinesis:*:*:stream/clamav*"
         },
         {
             "Effect": "Allow",
             "Action": "iam:*",
-            "Resource": "arn:aws:iam::*:role/*-${service}"
+            "Resource": "arn:aws:iam::*:role/*-clamav"
         },
         {
             "Effect": "Allow",
             "Action": "sqs:*",
-            "Resource": "arn:aws:sqs:*:*:${service}*"
+            "Resource": "arn:aws:sqs:*:*:clamav*"
         },
         {
             "Effect": "Allow",
@@ -71,7 +71,7 @@
                 "events:Remove*",
                 "events:Delete*"
             ],
-            "Resource": "arn:aws:events:*:*:rule/${service}*"
+            "Resource": "arn:aws:events:*:*:rule/clamav*"
         },
         {
             "Effect": "Allow",
@@ -87,7 +87,7 @@
                 "s3:DeleteBucket",
                 "s3:GetObject"
             ],
-            "Resource": "arn:aws:s3:::${service}*"
+            "Resource": "arn:aws:s3:::clamav*"
         },
         {
             "Effect": "Allow",
@@ -106,7 +106,7 @@
                 "logs:DescribeLogStreams",
                 "logs:FilterLogEvents"
             ],
-            "Resource": "arn:aws:logs:*:*:log-group:/aws/lambda/${service}*:log-stream:*"
+            "Resource": "arn:aws:logs:*:*:log-group:/aws/lambda/clamav*:log-stream:*"
         },
         {
             "Effect": "Allow",
@@ -116,7 +116,7 @@
                 "events:Delete*",
                 "events:Describe*"
             ],
-            "Resource": "arn:aws:events:*:*:rule/${service}*"
+            "Resource": "arn:aws:events:*:*:rule/clamav*"
         },
         {
             "Effect": "Allow",
@@ -133,10 +133,11 @@
                 "lambda:UpdateAlias",
                 "lambda:GetFunctionConfiguration",
                 "lambda:AddPermission",
-                "lambda:InvokeFunction"
+                "lambda:InvokeFunction",
+                "lambda:RemovePermission"
             ],
             "Resource": [
-                "arn:aws:lambda:*:*:function:${service}*"
+                "arn:aws:lambda:*:*:function:clamav*"
             ]
         }
     ]

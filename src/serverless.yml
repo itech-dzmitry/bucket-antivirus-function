@@ -18,7 +18,7 @@ provider:
   runtime: python3.6
   region: eu-central-1
   environment:
-    AV_DEFINITION_S3_BUCKET: ${opt:AV_DEFINITION_S3_BUCKET, 'clamav.definition'}
+    AV_DEFINITION_S3_BUCKET: ${env:AV_DEFINITION_S3_BUCKET}
 
 
 # you can overwrite defaults here

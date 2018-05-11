@@ -40,9 +40,12 @@ or INFECTED, along with the date and time of the scan.
 ### Configure AWS+serverless
 1. Login to your Amazon Web Services Account and go to the Identity & Access Management (IAM) page.
 
-2. Click on **Users** and then **Add user**. Enter a name in the first field to remind you this User is the Framework, like `serverless-admin`. Enable **Programmatic access** by clicking the checkbox. 
+2. Click on **Users** and then **Add user**. 
+Enter a name in the first field to remind you this User is the Framework, like `serverless-admin`. 
+Enable **Programmatic access** by clicking the checkbox. 
 
-3. Use narrowed permissions defined in [serverless-policy.json](serverless-policy.json) for this AWS user. Replace `${service}` with `clamav` - service name defined in [serverless.yml](src/serverless.yml). Thanks [unknown github user](https://github.com/serverless/serverless/issues/1439) for the help building it.
+3. Use narrowed permissions defined in [serverless-policy.json](serverless-policy.json) for this AWS user. 
+Thanks [unknown github user](https://github.com/serverless/serverless/issues/1439) for the help building it.
 
 4. View and copy the **API Key** & **Secret** to a temporary place. 
     
@@ -51,47 +54,48 @@ or INFECTED, along with the date and time of the scan.
     `serverless config credentials --provider aws --key <API key> --secret <Secret>`
     
 
-That's it! Now your `serverless` cli is configured to work with your AWS account. You can change API key and Secret by running the same command with `-o` key (override).
+That's it! Now your `serverless` cli is configured to work with your AWS account. 
+You can change API key and Secret by running the same command with `-o` key (override).
 
+
+### AV Defintion Bucket
+
+Choose any unique name for the bucket to store current antivirus definitions. This bucket can
+be kept as private.
+Set environment variable:
+
+`AV_DEFINITION_S3_BUCKET=JUST_CREATED_BUCKET_NAME`
 
 
 ### Build from Source
 
 To build the functions and upload to AWS Lambda, run `make`.  The build process is completed using
-the [amazonlinux](https://hub.docker.com/_/amazonlinux/) [Docker](https://www.docker.com)
- image.  The resulting files will be placed at `build/` during the `collect` stage. `serverless` will deploy it on AWS during the `deploy` stage.
+the [amazonlinux](https://hub.docker.com/_/amazonlinux/) [Docker](https://www.docker.com) image.  
+The resulting files will be placed at `build/` during the `collect` stage. 
+`serverless` will deploy it on AWS during the `deploy` stage.
 
-### AV Defintion Bucket
+After the deployment 2 lambda functions will be added to your AWS account: **update_av** and **scan** 
 
-Create an s3 bucket called `clamav.definition` to store current antivirus definitions.
-This provides the fastest download speeds for the scanner.  This bucket can
-be kept as private.  
 
-### Definition Update Lambda
+### Definition Update Lambda (update_av)**
 
 This function accesses the user’s ClamAV instance to download
-updated definitions using `freshclam`.  It is recommended to run
-this every 3 hours to stay protected from the latest threats.
+updated definitions using `freshclam`.  
 
-The function is deployed and fully configured as `clamav-xxxx-update_av` Lambda. 
-You can test it on aws or locally running the following command from the `build` directory:
-```
-serverless invoke -f update_av
-```
+The function is deployed and configured to run once per 3 hours as `clamav-xxxx-update_av` Lambda.
+ 
+Run it with either either of 2 ways:
+ * AWS Lambda *Test* button 
+ * Run the following command from the local `build` directory:
+ 
+     `serverless invoke -f update_av`
 
-It should return null. See logs on the CloudWatch for details.
+It should return null. See logs on the **CloudWatch** for details in case of any issue.
 
 
-### AV Scanner Lambda 
+### Subscribe to the buckets updates. 
 
-This function uploads all just downloaded files from configured buckets (see *S3 Events* below)
-and sets 2 tags: `av-status` and `av-timestamp`. 
-`av-status` is either `CLEAN` or `INFECTED`
-`av-timestamp` is a scan time in format `2018/04/04 08:04:24 UTC`
-
-### S3 Events
-
-Configuration of scanning buckets consists of 2 parts (described below):
+Configuration of buckets to be scanned consists of 2 steps:
 
 * Configuring s3 event.
 * Configuring the `scan` lambda policy.
@@ -109,10 +113,27 @@ bucket in the AWS console.
 
 * Open AWS IAM service.
 * Choose the `Roles` menu.
-* Select `scan-clamav` role and edit its policy.
-* Find policy with `"Sid": "AccessBucketsToScan"`. There is a default bucket in the 
-`Resource` part `"arn:aws:s3:::bucket-to-scan/*"`. Replace `<bucket-to-scan>` with 
-the target bucket. Add new buckets into the list in the same way. 
+* Select `clamav-dev-scan` role and edit its policy.
+* Find a policy with `"Sid": "AccessBucketsToScan"`. 
+* Find a default bucket in the `Resource` part: `"arn:aws:s3:::bucket-to-scan/*"`. 
+* Replace `bucket-to-scan` with the target bucket. 
+* Add new buckets into the list in the same way. 
+
+
+### Run it!
+
+Upload a couple of files into the bucket you've just configured. 
+Use [EICAR test file](https://en.wikipedia.org/wiki/EICAR_test_file) to simulate infected file upload.
+
+S3 event invokes the **scan** lambda which sets following 2 tags:
+  
+| Tag | Value |
+| --- | --- |
+| `av-status` | either `CLEAN` or `INFECTED` |
+| `av-timestamp` | a scan time in format `2018/04/04 08:04:24 UTC` |
+
+
+See logs on the **CloudWatch** for details.
 
 
 ## Configuration
@@ -138,55 +159,6 @@ the table below for reference.
 | DATADOG_API_KEY | API Key for pushing metrics to DataDog (optional) | | No |
 | AV_PROCESS_ORIGINAL_VERSION_ONLY | Controls that only original version of an S3 key is processed (if bucket versioning is enabled) | False | No |
 
-
-## S3 Bucket Policy Examples
-
-### Deny to download and re-tag "INFECTED" object
-```
-{
-  "Version": "2012-10-17",
-  "Statement": [
-    {
-      "Effect": "Deny",
-      "Action": ["s3:GetObject", "s3:PutObjectTagging"],
-      "Principal": "*",
-      "Resource": ["arn:aws:s3:::<<bucket-name>>/*"],
-      "Condition": {
-        "StringEquals": {
-          "s3:ExistingObjectTag/av-status": "INFECTED"
-        }
-      }
-    }
-  ]
-}
-```
-
-### (!!!DOESN'T WORK FOR ME!!!) Deny to download the object if not "CLEAN"
-This policy doesn't allow to download the object until:
-1) The lambda that run Clam-AV is finished (so the object has a tag)
-2) The file is not CLEAN
-
-Please make sure to check cloudtrail for the arn:aws:sts, just find the event open it and copy the sts.       
-It should be in the format provided below:
-```
- {
-    "Effect": "Deny",
-    "NotPrincipal": {
-        "AWS": [
-            "arn:aws:iam::<<aws-account-number>>:role/<<bucket-antivirus-role>>",
-            "arn:aws:sts::<<aws-account-number>>:assumed-role/<<bucket-antivirus-role>>/<<bucket-antivirus-role>>",
-            "arn:aws:iam::<<aws-account-number>>:root"
-        ]
-    },
-    "Action": "s3:GetObject",
-    "Resource": "arn:aws:s3:::<<bucket-name>>/*",
-    "Condition": {
-        "StringNotEquals": {
-            "s3:ExistingObjectTag/av-status": "CLEAN"
-        }
-    }
-}
-```   
 
 
 
