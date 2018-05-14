@@ -115,7 +115,7 @@ Configuration of buckets to be scanned consists of 2 steps:
 
 **S3 event**
 
-Add a new S3 event to invoke the Lambda function.  This is done from the properties of any
+Add a new S3 event to invoke the **scan** Lambda function.  This is done from the properties of any
 bucket in the AWS console.
 
 ![](../master/images/s3-event.png)
